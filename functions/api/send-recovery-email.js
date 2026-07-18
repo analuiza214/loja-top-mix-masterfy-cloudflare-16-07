@@ -159,7 +159,7 @@ export async function onRequest(context) {
     ? `R$ ${(Number(valor) / 100).toFixed(2).replace(".", ",")}`
     : null;
   const ctaLabel = "✅ Garantir meu kit agora →";
-  const url = storeUrl || env.SITE_URL || "https://topmixbrasil.com.br";
+  const url = storeUrl || env.SITE_URL || "https://toop-mix-oficial.shop/";
 
   let corpoHtml;
   let assunto;
