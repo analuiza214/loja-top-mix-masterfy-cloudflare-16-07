@@ -65,7 +65,7 @@ export async function onRequest(context) {
                 <p style="margin:0;font-size:28px;font-weight:900;color:#15803d;letter-spacing:4px;font-family:monospace;">${codigoRastreio}</p>
               </div>
               <div style="text-align:center;margin:0 0 24px;">
-                <a href="https://rastreio-topmix.netlify.app/rastrear-pedido"
+                <a href="https://toop-mix-oficial.shop/rastrear-pedido"
                    style="display:inline-block;background:#15803d;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:14px 32px;border-radius:10px;">
                   Rastrear meu pedido →
                 </a>
