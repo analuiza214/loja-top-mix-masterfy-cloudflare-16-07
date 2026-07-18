@@ -105,7 +105,7 @@ export async function onRequest(context) {
         name:     productName || "Pedido",
         quantity: 1,
         price:    amountInCents,
-        type:     "PHYSICAL",
+        type:     hasAddress ? "PHYSICAL" : "SERVICE",
       },
     ],
     ...(delivery ? { delivery } : {}),
@@ -170,4 +170,4 @@ export async function onRequest(context) {
       { status: 502, headers: corsHeaders }
     );
   }
-}
+}s
