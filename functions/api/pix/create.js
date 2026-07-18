@@ -105,7 +105,7 @@ export async function onRequest(context) {
         name:     productName || "Pedido",
         quantity: 1,
         price:    amountInCents,
-        type:     hasAddress ? "PHYSICAL" : "SERVICE",
+        type:     hasAddress ? "PHYSICAL" : "DIGITAL",
       },
     ],
     ...(delivery ? { delivery } : {}),
