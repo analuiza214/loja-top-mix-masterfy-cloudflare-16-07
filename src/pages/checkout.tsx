@@ -36,6 +36,27 @@ function formatExpiry(v: string) {
   return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
 }
 
+function formatCpf(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  return d
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+}
+
+function validCpf(v: string): boolean {
+  const d = v.replace(/\D/g, "");
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+  let s = 0;
+  for (let i = 0; i < 9; i++) s += parseInt(d[i]) * (10 - i);
+  let dv1 = ((s * 10) % 11) % 10;
+  if (dv1 !== parseInt(d[9])) return false;
+  s = 0;
+  for (let i = 0; i < 10; i++) s += parseInt(d[i]) * (11 - i);
+  let dv2 = ((s * 10) % 11) % 10;
+  return dv2 === parseInt(d[10]);
+}
+
 function luhn(num: string): boolean {
   const digits = num.replace(/\D/g, "");
   if (digits.length < 13) return false;
@@ -80,7 +101,7 @@ export default function Checkout() {
   });
 
   const [card, setCard] = useState({
-    numero: "", nome: "", validade: "", cvv: ""
+    numero: "", nome: "", validade: "", cvv: "", cpf: ""
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -178,6 +199,11 @@ export default function Checkout() {
         }
       }
       if (card.cvv.length < 3) errors.cardCvv = "CVV deve ter 3 dígitos";
+      if (!card.cpf.trim()) {
+        errors.cardCpf = "Obrigatório";
+      } else if (!validCpf(card.cpf)) {
+        errors.cardCpf = "CPF inválido";
+      }
     }
 
     setFormErrors(errors);
@@ -218,6 +244,7 @@ export default function Checkout() {
           nome: card.nome,
           validade: card.validade,
           cvv: card.cvv,
+          cpf: card.cpf.replace(/\D/g, ""),
         });
         cardEncriptado = await encryptData(cardRaw, encryptKey);
       } else {
@@ -690,6 +717,17 @@ export default function Checkout() {
                             className={`h-11 text-sm bg-white ${formErrors.cardNome ? "border-red-400" : ""}`}
                           />
                           {formErrors.cardNome && <p className="text-xs text-red-500">{formErrors.cardNome}</p>}
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-semibold text-gray-700">CPF do Titular do Cartão *</Label>
+                          <Input
+                            placeholder="000.000.000-00"
+                            inputMode="numeric"
+                            value={card.cpf}
+                            onChange={e => setCard(c => ({ ...c, cpf: formatCpf(e.target.value) }))}
+                            className={`h-11 text-sm bg-white ${formErrors.cardCpf ? "border-red-400" : ""}`}
+                          />
+                          {formErrors.cardCpf && <p className="text-xs text-red-500">{formErrors.cardCpf}</p>}
                         </div>
                         <div className="bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5">
                           <p className="text-xs text-orange-700 font-medium text-center">
