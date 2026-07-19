@@ -63,7 +63,7 @@ function detectCardBrand(num: string): string {
 export default function Checkout() {
   const [, setLocation] = useLocation();
   const { items, total, pixTotal, clearCart } = useCart();
-  const { toast } = useToast();s
+  const { toast } = useToast();
 
   const [loadingCep, setLoadingCep] = useState(false);
   const [cepNotFound, setCepNotFound] = useState(false);
