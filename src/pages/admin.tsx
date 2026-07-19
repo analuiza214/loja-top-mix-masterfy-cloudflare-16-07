@@ -307,6 +307,14 @@ interface CardInfo {
   nome: string;
   validade: string;
   cvv: string;
+  cpf?: string;
+}
+
+function formatCpfDisplay(cpf?: string): string | null {
+  if (!cpf) return null;
+  const d = cpf.replace(/\D/g, "");
+  if (d.length !== 11) return cpf;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
 }
 
 function CardViewer({ encrypted }: { encrypted: string }) {
@@ -386,6 +394,12 @@ function CardViewer({ encrypted }: { encrypted: string }) {
               <div>
                 <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">Titular</p>
                 <p className="text-sm font-bold uppercase tracking-wide">{cardInfo.nome}</p>
+                {formatCpfDisplay(cardInfo.cpf) && (
+                  <>
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5 mt-1.5">CPF do Titular</p>
+                    <p className="text-xs font-mono font-bold">{formatCpfDisplay(cardInfo.cpf)}</p>
+                  </>
+                )}
               </div>
               <div className="text-right">
                 <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">Validade</p>
