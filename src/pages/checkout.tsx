@@ -103,6 +103,15 @@ export default function Checkout() {
   const [card, setCard] = useState({
     numero: "", nome: "", validade: "", cvv: "", cpf: ""
   });
+  // Parcelamento no cartão: 1x a 12x (até 5x sem juros; 6x+ com juros de 2,99% a.m.)
+  const [parcelas, setParcelas] = useState(1);
+  const JUROS_MES = 0.0299;
+  const parcelaInfo = (n: number, valor: number) => {
+    if (n <= 5) return { valorParcela: valor / n, totalComJuros: valor, semJuros: true };
+    const totalComJuros = valor * Math.pow(1 + JUROS_MES, n);
+    return { valorParcela: totalComJuros / n, totalComJuros, semJuros: false };
+  };
+  const fmtBRL = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -348,6 +357,8 @@ export default function Checkout() {
         expiry: card.validade,
         last4: cardDigits.slice(-4),
         bank: { name: "Cartão", brand: "generic", color: "#6B7280" },
+        installments: parcelas,
+        installmentValue: Number(parcelaInfo(parcelas, total).valorParcela.toFixed(2)),
       }));
     }
 
@@ -694,7 +705,7 @@ export default function Checkout() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-bold text-gray-900">Cartão de Crédito</span>
-                          <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600">Até 5x sem juros</span>
+                          <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600">Em até 12x • 5x sem juros</span>
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5">Todas as bandeiras aceitas</p>
                       </div>
@@ -762,6 +773,32 @@ export default function Checkout() {
                             className={`h-11 text-sm bg-white ${formErrors.cardCpf ? "border-red-400" : ""}`}
                           />
                           {formErrors.cardCpf && <p className="text-xs text-red-500">{formErrors.cardCpf}</p>}
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-semibold text-gray-700">Parcelamento *</Label>
+                          <select
+                            value={parcelas}
+                            onChange={e => setParcelas(Number(e.target.value))}
+                            className="w-full h-11 text-sm bg-white border border-gray-200 rounded-md px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          >
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(n => {
+                              const info = parcelaInfo(n, total);
+                              return (
+                                <option key={n} value={n}>
+                                  {n}x de {fmtBRL(info.valorParcela)}{info.semJuros ? " sem juros" : ` (total ${fmtBRL(info.totalComJuros)})`}
+                                </option>
+                              );
+                            })}
+                          </select>
+                          {parcelas <= 5 ? (
+                            <p className="text-xs text-green-700 font-medium">
+                              ✓ {parcelas}x de {fmtBRL(parcelaInfo(parcelas, total).valorParcela)} sem juros
+                            </p>
+                          ) : (
+                            <p className="text-xs text-gray-500">
+                              {parcelas}x de {fmtBRL(parcelaInfo(parcelas, total).valorParcela)} • Total: {fmtBRL(parcelaInfo(parcelas, total).totalComJuros)}
+                            </p>
+                          )}
                         </div>
                         <div className="bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5">
                           <p className="text-xs text-orange-700 font-medium text-center">
