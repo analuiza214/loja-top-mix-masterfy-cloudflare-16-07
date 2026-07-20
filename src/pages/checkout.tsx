@@ -106,6 +106,18 @@ export default function Checkout() {
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+  // "Tentar outro cartão": chega com ?pagamento=cartao — já seleciona cartão
+  // e rola direto até a seção de pagamento
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("pagamento") === "cartao") {
+      setPaymentMethod("card");
+      setTimeout(() => {
+        document.getElementById("secao-pagamento")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    }
+  }, []);
+
   useEffect(() => {
     const saved = localStorage.getItem("topmix_buyer");
     if (saved) {
@@ -637,7 +649,7 @@ export default function Checkout() {
             </div>
 
             {/* ── Forma de Pagamento ── */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div id="secao-pagamento" className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden scroll-mt-4">
               <div className="px-4 py-3.5 border-b border-gray-100 flex items-center gap-2.5">
                 <span className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0" style={{ background: "#15803d" }}>3</span>
                 <span className="font-bold text-gray-900 text-sm">Forma de Pagamento</span>

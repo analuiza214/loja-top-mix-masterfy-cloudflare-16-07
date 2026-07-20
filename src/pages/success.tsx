@@ -651,7 +651,7 @@ export default function Success() {
                 Pagar via Pix agora
               </button>
               <button
-                onClick={() => setLocation("/checkout")}
+                onClick={() => setLocation("/checkout?pagamento=cartao")}
                 className="w-full h-11 rounded-xl border-2 border-gray-200 text-gray-700 font-medium text-sm"
               >
                 Tentar outro cartão
