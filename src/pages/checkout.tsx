@@ -83,7 +83,7 @@ function detectCardBrand(num: string): string {
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
-  const { items, total, pixTotal, clearCart } = useCart();
+  const { items, total, pixTotal } = useCart();
   const { toast } = useToast();
 
   const [loadingCep, setLoadingCep] = useState(false);
@@ -339,7 +339,10 @@ export default function Checkout() {
       }));
     }
 
-    clearCart();
+    // O carrinho NÃO é limpo aqui — assim o cliente pode voltar ao checkout
+    // ("Tentar outro cartão") com os mesmos itens, e evita o flash de
+    // "carrinho vazio" durante a navegação. Ele é limpo na tela de sucesso
+    // quando o pagamento é confirmado.
     setProcessing(true);
 
     if (paymentMethod === "pix") {

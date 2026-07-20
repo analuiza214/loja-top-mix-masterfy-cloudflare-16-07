@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { X, AlertCircle, RefreshCw, CreditCard, Copy, CheckCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { pushEcommerceEvent } from "@/lib/tracking";
+import { useCart } from "@/hooks/use-cart";
 
 type Phase = "loading" | "reveal" | "content";
 
@@ -283,6 +284,7 @@ const MAX_POLLS = 72;
 
 export default function Success() {
   const [, setLocation] = useLocation();
+  const { clearCart } = useCart();
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const payment = params.get("payment") || "pix";
   const fromDeclined = params.get("from") === "declined";
@@ -405,6 +407,7 @@ export default function Success() {
               trackingFired.current = true;
               fireTrackingEvents(orderAmount, orderProductName);
             }
+            clearCart();
             setPaymentConfirmed(true);
           }
         } catch { /* ignored */ }
@@ -548,7 +551,7 @@ export default function Success() {
   // ── Tela de loading ───────────────────────────────────────────────────────
   if (phase === "loading") {
     return (
-      <div className="fixed inset-0 bg-white flex flex-col items-center justify-center gap-6">
+      <div className="fixed inset-0 bg-white flex flex-col items-center justify-center gap-6 select-none" style={{ caretColor: "transparent" }} tabIndex={-1}>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -571,7 +574,7 @@ export default function Success() {
   // ── Animação reveal ───────────────────────────────────────────────────────
   if (phase === "reveal") {
     return (
-      <div className="fixed inset-0 bg-white flex items-center justify-center overflow-hidden">
+      <div className="fixed inset-0 bg-white flex items-center justify-center overflow-hidden select-none" style={{ caretColor: "transparent" }} tabIndex={-1}>
         <RippleRings color="#22c55e" />
         {showParticles && <ParticleBurst color="#22c55e" />}
         <motion.div
