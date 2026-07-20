@@ -132,6 +132,102 @@ function whatsappCardHelpLink(last4: string): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
 
+const WhatsAppSvg = ({ size = 20 }: { size?: number }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+);
+
+// ── Popup de ajuda via WhatsApp ──────────────────────────────────────────────
+function WhatsAppHelpModal({
+  open, onClose, href, title, text,
+}: {
+  open: boolean;
+  onClose: () => void;
+  href: string;
+  title: string;
+  text: string;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(3px)" }}
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 16 }}
+            transition={{ type: "spring", stiffness: 320, damping: 26 }}
+            className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Cabeçalho verde WhatsApp */}
+            <div
+              className="relative px-6 pt-8 pb-12 text-center"
+              style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
+            >
+              <button
+                onClick={onClose}
+                aria-label="Fechar"
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <motion.div
+                animate={{ scale: [1, 1.08, 1] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                className="w-20 h-20 rounded-full bg-white mx-auto flex items-center justify-center shadow-lg text-[#25D366]"
+              >
+                <WhatsAppSvg size={44} />
+              </motion.div>
+              <div className="mt-3 flex items-center justify-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-green-300 animate-pulse" />
+                <p className="text-white/90 text-xs font-semibold uppercase tracking-wider">Atendimento online agora</p>
+              </div>
+            </div>
+
+            {/* Corpo */}
+            <div className="px-6 pt-6 pb-7 text-center -mt-6 bg-white rounded-t-3xl relative">
+              <h2 className="text-xl font-black text-gray-900 leading-snug mb-2">{title}</h2>
+              <p className="text-sm text-gray-500 leading-relaxed mb-5">{text}</p>
+
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 rounded-2xl font-bold text-base text-white flex items-center justify-center gap-2.5 transition-all hover:opacity-90 active:scale-[0.98] shadow-lg shadow-green-200"
+                style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
+              >
+                <WhatsAppSvg size={22} />
+                Falar no WhatsApp agora
+              </a>
+
+              <button
+                onClick={onClose}
+                className="w-full text-gray-400 font-medium text-xs text-center pt-4 hover:text-gray-600 transition-colors"
+              >
+                Continuar tentando por aqui
+              </button>
+
+              <div className="flex items-center justify-center gap-3 mt-4 text-[10px] text-gray-400">
+                <span>🔒 Conversa segura</span>
+                <span>•</span>
+                <span>⚡ Resposta rápida</span>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function Countdown({ seconds }: { seconds: number }) {
   const [left, setLeft] = useState(seconds);
   useEffect(() => {
@@ -197,6 +293,16 @@ export default function Success() {
 
   const [pixData, setPixData] = useState<PixData | null>(null);
   const pixAttempts = loadPixAttempts();
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  // Abre o popup de ajuda automaticamente após 3+ tentativas (PIX ou cartão)
+  useEffect(() => {
+    if (phase !== "content") return;
+    const eligible = payment === "card" ? loadCardAttempts() >= 3 : pixAttempts >= 3;
+    if (!eligible) return;
+    const t = setTimeout(() => setHelpOpen(true), 1800);
+    return () => clearTimeout(t);
+  }, [phase, payment, pixAttempts]);
   const [pixLoading, setPixLoading] = useState(false);
   const [pixError, setPixError] = useState<string | null>(null);
   const [orderAmount, setOrderAmount] = useState(49.0);
@@ -547,23 +653,13 @@ export default function Success() {
               >
                 Tentar outro cartão
               </button>
-              {/* Botão de ajuda via WhatsApp — aparece a partir da 3ª tentativa com o mesmo cartão */}
-              {loadCardAttempts() >= 3 && (
-                <motion.a
-                  href={whatsappCardHelpLink(last4)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 text-center transition-all hover:opacity-90 active:scale-[0.98] shadow-md"
-                  style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
-                >
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                  </svg>
-                  Cartão recusado de novo? Me chame no WhatsApp que te ajudo!
-                </motion.a>
-              )}
+              <WhatsAppHelpModal
+                open={helpOpen}
+                onClose={() => setHelpOpen(false)}
+                href={whatsappCardHelpLink(last4)}
+                title="Cartão recusado de novo?"
+                text="Percebemos que seu banco não autorizou o pagamento mais de uma vez. Isso é mais comum do que parece — me chame no WhatsApp que eu te explico o motivo e resolvo com você agora mesmo, sem compromisso."
+              />
               <button
                 onClick={() => setLocation("/")}
                 className="w-full text-gray-400 font-medium text-sm text-center py-1"
@@ -726,23 +822,13 @@ export default function Success() {
                     : <><Copy className="w-5 h-5" /> Copiar código Pix</>}
                 </button>
 
-                {/* Botão de ajuda via WhatsApp — aparece a partir da 3ª geração de PIX */}
-                {pixAttempts >= 3 && (
-                  <motion.a
-                    href={whatsappHelpLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 text-center transition-all hover:opacity-90 active:scale-[0.98] shadow-md"
-                    style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
-                  >
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                    </svg>
-                    Não conseguiu pagar? Me chame no WhatsApp que resolvo agora!
-                  </motion.a>
-                )}
+                <WhatsAppHelpModal
+                  open={helpOpen}
+                  onClose={() => setHelpOpen(false)}
+                  href={whatsappHelpLink()}
+                  title="Não está conseguindo pagar o Pix?"
+                  text="Alguns bancos mostram avisos no Pix que assustam, mas seu pedido está certinho. Me chame no WhatsApp que eu te explico na hora e te ajudo a finalizar o pagamento com segurança."
+                />
 
                 <button
                   onClick={() => setLocation("/")}
