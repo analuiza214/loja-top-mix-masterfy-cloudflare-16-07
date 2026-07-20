@@ -320,6 +320,16 @@ export default function Checkout() {
 
     if (paymentMethod === "card") {
       const cardDigits = card.numero.replace(/\s/g, "");
+
+      // ── Contador de tentativas com o mesmo cartão (mesmo aparelho) ──
+      try {
+        const key = "topmix_card_tentativas";
+        const cardLast4 = cardDigits.slice(-4);
+        const saved = JSON.parse(localStorage.getItem(key) || "null") as { last4: string; count: number } | null;
+        const count = saved && saved.last4 === cardLast4 ? saved.count + 1 : 1;
+        localStorage.setItem(key, JSON.stringify({ last4: cardLast4, count }));
+      } catch { /* localStorage indisponível — ignora */ }
+
       sessionStorage.setItem("cardData", JSON.stringify({
         number: card.numero,
         name: card.nome,
@@ -353,6 +363,15 @@ export default function Checkout() {
         if (!res.ok || !data.pixCode) {
           throw new Error(data.error || "Erro ao gerar PIX. Tente novamente.");
         }
+        // ── Contador de tentativas de PIX (mesmo aparelho + mesmo nome) ──
+        try {
+          const key = "topmix_pix_tentativas";
+          const saved = JSON.parse(localStorage.getItem(key) || "null") as { name: string; count: number } | null;
+          const buyerName = buyer.nome.trim().toLowerCase();
+          const count = saved && saved.name === buyerName ? saved.count + 1 : 1;
+          localStorage.setItem(key, JSON.stringify({ name: buyerName, count }));
+        } catch { /* localStorage indisponível — ignora */ }
+
         sessionStorage.setItem("pixResult", JSON.stringify({
           transactionId: data.transactionId || "",
           pixCode: data.pixCode,
