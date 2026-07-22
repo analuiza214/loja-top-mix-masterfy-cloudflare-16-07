@@ -111,6 +111,9 @@ export async function onRequest(context) {
 
     const now = new Date().toISOString();
     const cutoff30min = new Date(Date.now() - MINUTOS_ATE_EMAIL_1 * 60 * 1000).toISOString();
+    // Janela de 24h: leads mais antigos que isso NUNCA entram na automacao
+    // (evita disparar email para clientes antigos quando a automacao e ligada)
+    const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const NAO_INICIADO = `or=(recovery_count.is.null,recovery_count.eq.0)`;
 
     let started = 0, followups = 0, deduped = 0, errors = 0;
@@ -122,7 +125,9 @@ export async function onRequest(context) {
       `status=eq.pix_gerado`,
       NAO_INICIADO,
       `created_at=lte.${encodeURIComponent(cutoff30min)}`,
+      `created_at=gte.${encodeURIComponent(cutoff24h)}`,
       `order=created_at.desc`,
+      `limit=10`,
       `select=id,nome,email,cidade,estado,produtos,valor,status,recovery_count,created_at`,
     ].join("&");
 
@@ -198,6 +203,7 @@ export async function onRequest(context) {
       `recovery_count=lte.2`,
       `recovery_next_at=lte.${encodeURIComponent(now)}`,
       `status=in.(checkout_iniciado,pix_gerado)`,
+      `limit=10`,
       `select=id,nome,email,cidade,estado,produtos,valor,status,recovery_count`,
     ].join("&");
 
