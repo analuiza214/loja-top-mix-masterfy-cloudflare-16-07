@@ -100,9 +100,10 @@ export async function onRequest(context) {
       }
     }
 
-    const SUPABASE_URL = env.SUPABASE_URL;
-    const SUPABASE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
-    const SITE_URL     = env.SITE_URL || "";
+    // .trim() remove espacos/quebras de linha invisiveis colados junto no painel
+    const SUPABASE_URL = (env.SUPABASE_URL || "").trim().replace(/\/+$/, "");
+    const SUPABASE_KEY = (env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
+    const SITE_URL     = (env.SITE_URL || "").trim().replace(/\/+$/, "");
 
     if (!SUPABASE_URL || !SUPABASE_KEY) {
       return new Response(JSON.stringify({ error: "SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY nao configurados." }), { status: 500, headers: corsHeaders });
